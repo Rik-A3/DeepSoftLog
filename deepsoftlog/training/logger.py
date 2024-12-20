@@ -33,6 +33,9 @@ class PrintLogger(Logger):
         # TODO
         print("EVAL:", values)
 
+    def log_fig(self, fig, name):
+        print("FIG NOT LOGGED:", name)
+
 
 class WandbLogger(Logger):
     def __init__(self, config):
@@ -54,3 +57,6 @@ class WandbLogger(Logger):
             project = self.config['project']
             wandb.init(name=name, project=project, config=self.config)
 
+    def log_fig(self, fig, name):
+        self._init_wandb()
+        wandb.log({name: wandb.Image(fig)})

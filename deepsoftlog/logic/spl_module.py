@@ -48,6 +48,13 @@ class SoftProofModule(ProofModule):
             return self.store.module
         return self.store
 
+    def get_similarity_matrix(self):
+        return self.store.get_similarity_matrix(self.embedding_metric)
+
+    def get_constant_embedding_matrix(self):
+        names = self.store.constant_embeddings.keys()
+        return names, torch.stack([self.store.constant_embeddings[name] for name in names]).detach().numpy()
+
     def parameters(self):
         yield from self.store.parameters()
         if self.semantics == "neural":

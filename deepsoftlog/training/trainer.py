@@ -13,6 +13,7 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.multiprocessing as mp
 import torch.distributed as dist
 
+from .visualise import visualise_embeddings, visualise_similarity_matrix
 from ..data.dataloader import DataLoader
 from ..data.query import Query
 from ..logic.spl_module import SoftProofModule
@@ -123,6 +124,10 @@ class Trainer:
             new_metrics = [get_metrics(query, result, dataloader.dataset) for query, result in results]
             metrics += new_metrics
         self.logger.log_eval(aggregate_metrics(metrics), name=name)
+        matrix = self.program.get_similarity_matrix()
+        self.logger.log_fig(visualise_similarity_matrix(matrix), name="similarity matrix")
+        names, matrix = self.program.get_constant_embedding_matrix()
+        self.logger.log_fig(visualise_embeddings(matrix, names), name="constant embeddings")
 
     def _query(self, queries: Iterable[Query]):
         for query in queries:
