@@ -1,5 +1,6 @@
 import torch
-from torch import nn
+from torch import nn, Tensor
+from transformers import AutoTokenizer, AutoModel
 
 
 class AdditionFunctor(nn.Module):
@@ -41,7 +42,6 @@ def _carry_probs(x1, x2):
     result[0] = (torch.cumsum(x2, 0).flip((0,)) * x1).sum()
     result[1] = 1 - result[0]
     return result
-
 
 class EmbeddingFunctor(nn.Module):
     def __init__(self, arity=1, ndims=128):
@@ -91,10 +91,71 @@ class LeNet5(nn.Module):
         x = x.view(-1, 16 * 4 * 4)
         x = self.classifier(x)[0]
         return self.activation(x)
+        #return
+
+class Llama31_8B(nn.Module):
+    """
+    TODO
+    """
+
+    def __init__(self):
+        pass # TODO
+
+    def forward(self, x):
+        pass # TODO
+
+    def eval(self):
+        pass # TODO
+
+MULTIPLIER = 6364136223846793005
+INCREMENT = 1
+MODULUS = 2**64
+
+def hash_tensor(x: Tensor) -> Tensor:
+    assert x.dtype == torch.int64
+    while x.ndim > 0:
+        x = _reduce_last_axis(x)
+    return x.item()
+
+@torch.no_grad()
+def _reduce_last_axis(x: Tensor) -> Tensor:
+    assert x.dtype == torch.int64
+    acc = torch.zeros_like(x[..., 0])
+    for i in range(x.shape[-1]):
+        acc *= MULTIPLIER
+        acc += INCREMENT
+        acc += x[..., i]
+        # acc %= MODULUS  # Not really necessary.
+    return acc
+
+class XLMRobertaLarge(nn.Module):
+    """
+    https://huggingface.co/FacebookAI/xlm-roberta-large
+    """
+
+    def __init__(self, ndims=1024):
+        super().__init__()
+
+        self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
+        self.model = AutoModel.from_pretrained("xlm-roberta-large")
+        for name,param in self.model.encoder.named_parameters():
+            if int(name.split(".")[1]) < 21:
+                param.requires_grad = False
+        self.embedding_store = {}
+
+    def forward(self, x):
+        if hash_tensor(x) not in self.embedding_store:
+            self.embedding_store[hash_tensor(x)] = self._forward(x)
+
+        return self.embedding_store[hash_tensor(x)]
+
+    def _forward(self, x):
+        embedding = self.model(x[:, 0, :], x[:, 1, :]).pooler_output
+        return torch.softmax(embedding, dim=1)
+
 
 
 if __name__ == "__main__":
-    model = CarryFunctor()
-    t = [[0, 0, .2, .2, 0, 0, 0, 0, 0, .6], [0, .8, 0, 0, 0, 0, 0, .1, .1, 0]]
-    t = torch.Tensor(t)
-    print(model(t))
+    model = XLMRobertaLarge()
+    embedding = model(["Hello, my dog is cute.", "Hello, my cat is cute."])
+    print(embedding)

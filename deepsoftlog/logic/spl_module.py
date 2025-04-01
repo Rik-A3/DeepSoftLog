@@ -49,7 +49,8 @@ class SoftProofModule(ProofModule):
         return self.store
 
     def get_similarity_matrix(self):
-        return self.store.get_similarity_matrix(self.embedding_metric)
+        names = self.store.constant_embeddings.keys()
+        return  names, self.store.get_similarity_matrix(self.embedding_metric)
 
     def get_constant_embedding_matrix(self):
         names = self.store.constant_embeddings.keys()
