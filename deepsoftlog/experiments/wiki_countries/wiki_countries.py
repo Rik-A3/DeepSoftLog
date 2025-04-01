@@ -1,3 +1,5 @@
+import os
+
 import torch
 
 from deepsoftlog.experiments.wiki_countries.dataset import generate_prolog_files, get_val_dataloader, \
@@ -9,6 +11,7 @@ from deepsoftlog.training.trainer import Trainer
 
 def train(cfg):
     cfg = load_config(cfg)
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.device_nb)
     generate_prolog_files()
     eval_dataloader = get_val_dataloader(cfg)
     program = load_program(cfg, eval_dataloader)
