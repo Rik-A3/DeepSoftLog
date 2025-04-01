@@ -1,6 +1,6 @@
-project: countries
-name: S2
-program: deepsoftlog/experiments/countries/data/tmp/countries_S2.pl
+project: wiki_countries
+name: S0
+program: deepsoftlog/experiments/wiki_countries/data/tmp/countries_S0.pl
 seed: 1337
 verbose: true
 data_subset: null
@@ -9,17 +9,17 @@ semantics: sdd2
 
 # optimization
 optimizer: AdamW
-embedding_learning_rate: 0.01
-functor_learning_rate: 0
+embedding_learning_rate: 0.001
+functor_learning_rate: 0.0001
 weight_decay: 0
 nb_epochs: 5
-batch_size: 8
+batch_size: 1
 grad_clip: null
 max_proofs: null
 max_depth: 2
 max_branching: 4
 
 # embeddings
-embedding_dimensions: 100
+embedding_dimensions: 1024
 embedding_initialization: sphere
 embedding_metric: angle
