@@ -151,18 +151,18 @@ class XLMRobertaLarge(nn.Module):
             if isinstance(layer, nn.BatchNorm2d):
                 layer.float()
 
+    # def forward(self, x):
+    #     if hash_tensor(x) not in self.embedding_store:
+    #         self.embedding_store[hash_tensor(x)] = [self._forward(x),0]
+    #
+    #     embedding, _ = self.embedding_store[hash_tensor(x)][1]
+    #     self.embedding_store[hash_tensor(x)][1] += 1
+    #     if self.embedding_store[hash_tensor(x)][1] > self.cache_count:
+    #         del self.embedding_store[hash_tensor(x)]
+    #
+    #     return embedding
+
     def forward(self, x):
-        if hash_tensor(x) not in self.embedding_store:
-            self.embedding_store[hash_tensor(x)] = [self._forward(x),0]
-
-        embedding, _ = self.embedding_store[hash_tensor(x)][1]
-        self.embedding_store[hash_tensor(x)][1] += 1
-        if self.embedding_store[hash_tensor(x)][1] > self.cache_count:
-            del self.embedding_store[hash_tensor(x)]
-
-        return embedding
-
-    def _forward(self, x):
         tokens = x[:, 0, :]
         attention_mask = x[:, 1, :]
 
