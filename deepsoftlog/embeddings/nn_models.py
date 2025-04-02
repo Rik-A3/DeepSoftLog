@@ -139,9 +139,16 @@ class XLMRobertaLarge(nn.Module):
         self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
         self.model = AutoModel.from_pretrained("xlm-roberta-large")
         for name,param in self.model.encoder.named_parameters():
-            if int(name.split(".")[1]) < 21:
+            if int(name.split(".")[1]) < 22: # All but the last layer
                 param.requires_grad = False
         self.embedding_store = {}
+
+    def half_precision(self):
+        self.model.half()
+
+        for layer in model.modules():
+            if isinstance(layer, nn.BatchNorm2d):
+                layer.float()
 
     def forward(self, x):
         if hash_tensor(x) not in self.embedding_store:
@@ -150,8 +157,13 @@ class XLMRobertaLarge(nn.Module):
         return self.embedding_store[hash_tensor(x)]
 
     def _forward(self, x):
-        embedding = self.model(x[:, 0, :], x[:, 1, :]).pooler_output
-        return torch.softmax(embedding, dim=1)
+        tokens = x[:, 0, :]
+        attention_mask = x[:, 1, :]
+
+        embedding = self.model(tokens, attention_mask)
+        pooler_output = embedding.pooler_output
+
+        return torch.softmax(pooler_output, dim=1)
 
 
 
