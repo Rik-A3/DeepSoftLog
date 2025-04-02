@@ -142,6 +142,7 @@ class XLMRobertaLarge(nn.Module):
             if int(name.split(".")[1]) < 22: # All but the last layer
                 param.requires_grad = False
         self.embedding_store = {}
+        self.cache_count = 10
 
     def half_precision(self):
         self.model.half()
@@ -152,9 +153,14 @@ class XLMRobertaLarge(nn.Module):
 
     def forward(self, x):
         if hash_tensor(x) not in self.embedding_store:
-            self.embedding_store[hash_tensor(x)] = self._forward(x)
+            self.embedding_store[hash_tensor(x)] = [self._forward(x),0]
 
-        return self.embedding_store[hash_tensor(x)]
+        embedding, _ = self.embedding_store[hash_tensor(x)][1]
+        self.embedding_store[hash_tensor(x)][1] += 1
+        if self.embedding_store[hash_tensor(x)][1] > self.cache_count:
+            del self.embedding_store[hash_tensor(x)]
+
+        return embedding
 
     def _forward(self, x):
         tokens = x[:, 0, :]

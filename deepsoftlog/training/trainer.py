@@ -118,6 +118,7 @@ class Trainer:
 
     def eval(self, dataloader: DataLoader, name='test'):
         self.program.store.eval()
+        torch.cuda.empty_cache()
         metrics = []
         for queries in tqdm(dataloader, leave=False, smoothing=0):
             results = zip(queries, self._eval_queries(queries))
@@ -160,7 +161,7 @@ class Trainer:
         loss = torch.stack(losses).mean()
         errors = [query.error_with(result) for result, query in zip(results, queries)]
         if loss.requires_grad:
-            loss.backward()
+            loss.backward(retain_graph=True)
         proof_steps, nb_proofs = float(np.mean(proof_steps)), float(np.mean(nb_proofs))
         return float(loss), float(np.mean(errors)), proof_steps, nb_proofs
 
