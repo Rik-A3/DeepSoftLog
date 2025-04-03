@@ -1,6 +1,7 @@
 import torch
 
 from deepsoftlog.experiments.countries.dataset import generate_prolog_files, get_test_dataloader, get_train_dataloader, get_val_dataloader
+from deepsoftlog.experiments.countries.visualise import visualise_matrix, get_located_in_matrix, COUNTRIES
 from deepsoftlog.training import load_program, load_config
 from deepsoftlog.training.logger import WandbLogger
 from deepsoftlog.training.loss import nll_loss, get_optimizer
@@ -24,6 +25,16 @@ def train(cfg):
     trainer.val_dataloader = eval_dataloader
     trainer.train(cfg)
     trainer.eval(get_test_dataloader())
+    # visualise task
+    region_matrix, subregion_matrix = get_located_in_matrix(cfg.name)
+    fig1 = visualise_matrix(region_matrix, COUNTRIES)
+    fig2 = visualise_matrix(subregion_matrix, COUNTRIES)
+    logger.log_fig(fig1, name="region matrix")
+    logger.log_fig(fig2, name="subregion matrix")
+    # visualise soft unification scores
+    names, matrix = trainer.program.get_soft_unification_matrix()
+    fig = visualise_matrix(matrix, names)
+    logger.log_fig(fig, name="similarity matrix")
 
 
 def eval(folder: str):
@@ -36,6 +47,7 @@ def eval(folder: str):
     trainer.max_branching = cfg['max_branching']
     trainer.max_depth = cfg['max_depth']
     trainer.eval(eval_dataloader)
+
 
 
 if __name__ == "__main__":

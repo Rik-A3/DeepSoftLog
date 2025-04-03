@@ -13,7 +13,6 @@ from torch.nn.parallel import DistributedDataParallel as DDP
 import torch.multiprocessing as mp
 import torch.distributed as dist
 
-from .visualise import visualise_embeddings, visualise_similarity_matrix, visualise_relations
 from ..data.dataloader import DataLoader
 from ..data.query import Query
 from ..logic.spl_module import SoftProofModule
@@ -125,12 +124,6 @@ class Trainer:
             new_metrics = [get_metrics(query, result, dataloader.dataset) for query, result in results]
             metrics += new_metrics
         self.logger.log_eval(aggregate_metrics(metrics), name=name)
-        names, matrix = self.program.get_similarity_matrix()
-        figs, rs, idxs = visualise_relations(self.program.clauses, names)
-        for fig, r in zip(figs,rs):
-            self.logger.log_fig(fig, name=f"relation matrix {r}")
-        fig = visualise_similarity_matrix(matrix, idxs)
-        self.logger.log_fig(fig, name="similarity matrix")
 
     def _query(self, queries: Iterable[Query]):
         for query in queries:
@@ -162,7 +155,10 @@ class Trainer:
         errors = [query.error_with(result) for result, query in zip(results, queries)]
         if loss.requires_grad:
             loss.backward()
-            self.get_store().functor_embeddings["('roberta', 1)"].reset_cache()
+            try:
+                self.get_store().functor_embeddings["('roberta', 1)"].reset_cache()
+            except:
+                pass
         proof_steps, nb_proofs = float(np.mean(proof_steps)), float(np.mean(nb_proofs))
         return float(loss), float(np.mean(errors)), proof_steps, nb_proofs
 
