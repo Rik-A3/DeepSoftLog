@@ -141,7 +141,7 @@ class XLMRobertaLarge(nn.Module):
         for name,param in self.model.encoder.named_parameters():
             if int(name.split(".")[1]) < 22: # All but the last layer
                 param.requires_grad = False
-        self.embedding_store = {}
+        self.embedding_cache = {}
         self.cache_count = 10
 
     def half_precision(self):
@@ -151,18 +151,13 @@ class XLMRobertaLarge(nn.Module):
             if isinstance(layer, nn.BatchNorm2d):
                 layer.float()
 
-    # def forward(self, x):
-    #     if hash_tensor(x) not in self.embedding_store:
-    #         self.embedding_store[hash_tensor(x)] = [self._forward(x),0]
-    #
-    #     embedding, _ = self.embedding_store[hash_tensor(x)][1]
-    #     self.embedding_store[hash_tensor(x)][1] += 1
-    #     if self.embedding_store[hash_tensor(x)][1] > self.cache_count:
-    #         del self.embedding_store[hash_tensor(x)]
-    #
-    #     return embedding
-
     def forward(self, x):
+        if hash_tensor(x) not in self.embedding_cache:
+            self.embedding_cache[hash_tensor(x)] = self._forward(x)
+
+        return self.embedding_cache[hash_tensor(x)]
+
+    def _forward(self, x):
         tokens = x[:, 0, :]
         attention_mask = x[:, 1, :]
 
@@ -171,6 +166,8 @@ class XLMRobertaLarge(nn.Module):
 
         return torch.softmax(pooler_output, dim=1)
 
+    def reset_cache(self):
+        self.embedding_cache = {}
 
 
 if __name__ == "__main__":
