@@ -124,6 +124,7 @@ class Trainer:
             new_metrics = [get_metrics(query, result, dataloader.dataset) for query, result in results]
             metrics += new_metrics
         self.logger.log_eval(aggregate_metrics(metrics), name=name)
+        return aggregate_metrics(metrics)
 
     def _query(self, queries: Iterable[Query]):
         for query in queries:
@@ -155,10 +156,6 @@ class Trainer:
         errors = [query.error_with(result) for result, query in zip(results, queries)]
         if loss.requires_grad:
             loss.backward()
-            try:
-                self.get_store().functor_embeddings["('roberta', 1)"].reset_cache()
-            except:
-                pass
         proof_steps, nb_proofs = float(np.mean(proof_steps)), float(np.mean(nb_proofs))
         return float(loss), float(np.mean(errors)), proof_steps, nb_proofs
 
@@ -177,7 +174,7 @@ class Trainer:
         save_folder = Path(save_folder)
         if save_folder.exists():
             shutil.rmtree(save_folder, ignore_errors=True)
-        save_folder.mkdir(parents=True)
+        save_folder.mkdir(parents=True, exist_ok=True)
 
         config.save(save_folder / "config.yaml")
         torch.save(self.get_store().state_dict(), save_folder / "store.pt")

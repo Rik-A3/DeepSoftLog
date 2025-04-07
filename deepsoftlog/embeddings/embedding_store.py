@@ -7,7 +7,7 @@ from torch import nn
 from ..parser.vocabulary import Vocabulary
 from .distance import embedding_similarity
 from .initialize_vector import Initializer
-from ..logic.soft_term import TensorTerm
+from ..logic.soft_term import TensorTerm, TextTerm
 from .nn_models import EmbeddingFunctor
 from deepsoftlog.algebraic_prover.terms.expression import Expr
 
@@ -53,7 +53,7 @@ class EmbeddingStore(nn.Module):
         return e
 
     def _embed_constant(self, term: Expr):
-        if isinstance(term, TensorTerm):
+        if isinstance(term, TensorTerm) or isinstance(term, TextTerm):
             return term.get_tensor().to(self.device)
 
         name = term.functor
@@ -70,25 +70,28 @@ class EmbeddingStore(nn.Module):
 
     def clear_cache(self):
         self._cache = dict()
+        if "('roberta', 1)" in self.functor_embeddings.keys():
+            self.functor_embeddings["('roberta', 1)"].clear_cache()
+        if "('text', 1)" in self.functor_embeddings.keys():
+            self.functor_embeddings["('text', 1)"].clear_cache()
 
     def to(self, device):
         self.device = device
         return super().to(device)
 
-    def get_soft_unification_matrix(self, distance_metric: str):
-        constants = list(self.constant_embeddings.keys())
-        n = len(constants)
+    def get_soft_unification_matrix(self, distance_metric: str, names):
+        n = len(names)
         matrix = torch.zeros(n, n)
-        for i, c1 in enumerate(constants):
-            for j, c2 in enumerate(constants):
+        for i, c1 in enumerate(names):
+            for j, c2 in enumerate(names):
                 e1, e2 = self.constant_embeddings[c1], self.constant_embeddings[c2]
-                matrix[i, j] = math.exp(embedding_similarity(e1, e2, distance_metric))
+                matrix[i, j] = embedding_similarity(e1, e2, distance_metric) # log probabilities
         return matrix.detach().numpy()
 
 def create_embedding_store(config, vocab_sources: Iterable) -> EmbeddingStore:
     ndim = config['embedding_dimensions']
     vocabulary = create_vocabulary(vocab_sources)
-    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim)
+    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim, config.get("text_embedding_mode"))
     store = EmbeddingStore(ndim, initializer, vocabulary)
     return store
 

@@ -1,6 +1,9 @@
+import itertools
+from collections.abc import Iterator
 from pathlib import Path
 import os
 import random
+from typing import Union, List
 
 import numpy as np
 import torch
@@ -31,8 +34,10 @@ class ConfigDict(dict):
         with open(file_name, "w+") as f:
             yaml.dump(dict(self), f)
 
+    def copy(self):
+        return ConfigDict(self)
 
-def load_program(config, init_dataloader: "DataLoader") -> "Program":
+def load_program(config, init_dataloader: Union["DataLoader", List["DataLoader"]]) -> "Program":
     config = load_config(config)
     set_seed(config['seed'])
 
@@ -41,7 +46,8 @@ def load_program(config, init_dataloader: "DataLoader") -> "Program":
         embedding_metric=config['embedding_metric'],
         semantics=config['semantics'],
     )
-    vocab = [program, init_dataloader.dataset]
+    init_dataloader = [init_dataloader] if not isinstance(init_dataloader, list) else init_dataloader
+    vocab = [program] + [dataloader.dataset for dataloader in init_dataloader]
     program.store = create_embedding_store(config, vocab_sources=vocab)
     return program
 

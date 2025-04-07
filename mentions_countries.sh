@@ -1,0 +1,3 @@
+#!/bin/bash
+python run_experiments.py mentions_countries deepsoftlog/experiments/mentions_countries/config_LM.yaml
+python run_experiments.py mentions_countries deepsoftlog/experiments/mentions_countries/config_baseline.yaml
