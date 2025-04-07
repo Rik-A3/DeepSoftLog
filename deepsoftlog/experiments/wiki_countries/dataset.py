@@ -13,9 +13,9 @@ from deepsoftlog.logic.soft_term import SoftTerm
 _DATA_ROOT = str(Path(__file__).parent / "tmp")
 
 class WikiDataset(TorchDataset):
-    def __init__(self):
+    def __init__(self, masked=False):
         base_path = Path(__file__).parent / 'data' / 'raw'
-        self.data = torch.load(base_path / f"tokens_tensor_list.pt")
+        self.data = torch.load(base_path / ("masked_" if masked else "") + f"tokens_tensor_list.pt")
 
         super().__init__()
 
@@ -36,6 +36,7 @@ class CountriesOperator(Dataset, TorchDataset):
         self,
         split_name: str,
         function_name: str,
+        masked=False,
         seed=None,
     ):
         """Generic data for operator(img, img) style datasets.
@@ -48,7 +49,7 @@ class CountriesOperator(Dataset, TorchDataset):
         """
         super(CountriesOperator, self).__init__()
         self.split_name = split_name
-        self.text_dataset = WikiDataset()
+        self.text_dataset = WikiDataset(masked)
         self.countries_dataset = CountriesDataset(split_name)
         self.function_name = function_name
         self.seed = seed
@@ -77,6 +78,7 @@ def get_train_dataloader(cfg):
     dataset = CountriesOperator(
         split_name="train",
         function_name="countries",
+        masked=cfg.masked,
         seed=cfg.seed
     )
     return DataLoader(dataset, batch_size=cfg['batch_size'], shuffle=True)
@@ -85,6 +87,7 @@ def get_val_dataloader(cfg):
     dataset = CountriesOperator(
         split_name="val",
         function_name="countries",
+        masked=cfg.masked,
         seed=cfg.seed
     )
     return DataLoader(dataset, batch_size=cfg['batch_size'], shuffle=True)
@@ -93,6 +96,7 @@ def get_test_dataloader(cfg):
     dataset = CountriesOperator(
         split_name="test",
         function_name="countries",
+        masked=cfg.masked,
         seed=cfg.seed
     )
     return DataLoader(dataset, batch_size=cfg['batch_size'], shuffle=True)

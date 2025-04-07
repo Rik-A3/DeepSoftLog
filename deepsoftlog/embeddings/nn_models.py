@@ -133,7 +133,7 @@ class XLMRobertaLarge(nn.Module):
     https://huggingface.co/FacebookAI/xlm-roberta-large
     """
 
-    def __init__(self, ndims=1024):
+    def __init__(self, ndims=100):
         super().__init__()
 
         self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
@@ -141,6 +141,7 @@ class XLMRobertaLarge(nn.Module):
         for name,param in self.model.encoder.named_parameters():
             if int(name.split(".")[1]) < 22: # All but the last layer
                 param.requires_grad = False
+        self.output_layer = nn.Linear(1024, ndims)
         self.embedding_cache = {}
         self.cache_count = 10
 
@@ -164,7 +165,7 @@ class XLMRobertaLarge(nn.Module):
         embedding = self.model(tokens, attention_mask)
         pooler_output = embedding.pooler_output
 
-        return torch.softmax(pooler_output, dim=1)
+        return torch.softmax(self.output_layer(pooler_output), dim=1)
 
     def reset_cache(self):
         self.embedding_cache = {}
@@ -172,5 +173,7 @@ class XLMRobertaLarge(nn.Module):
 
 if __name__ == "__main__":
     model = XLMRobertaLarge()
-    embedding = model(["Hello, my dog is cute.", "Hello, my cat is cute."])
+    tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
+    ts = list([torch.tensor(x) for x in tokenizer(["Hello, my dog is cute.", "Hello, my cat is cute."]).values()])
+    embedding = model(torch.stack(ts, dim=1))
     print(embedding)

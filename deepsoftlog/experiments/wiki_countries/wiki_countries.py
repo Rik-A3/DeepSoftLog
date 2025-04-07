@@ -42,4 +42,4 @@ def eval(folder: str):
 
 
 if __name__ == "__main__":
-    train("deepsoftlog/experiments/wiki_countries/config.yaml")
+    train("deepsoftlog/experiments/wiki_countries/config_S0.yaml")

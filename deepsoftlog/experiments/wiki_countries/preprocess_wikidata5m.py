@@ -1,9 +1,11 @@
+import re
 from pathlib import Path
 
 import torch
 from transformers import AutoTokenizer
 
 from deepsoftlog.data import load_tsv_file
+from deepsoftlog.experiments.countries.visualise import COUNTRIES
 
 KEYWORDS = ['history', 'city', 'capital', 'country', 'province', 'island']
 SUBCONTINENTS = ['southern_asia', 'south-eastern_asia', 'eastern_asia', 'central_asia', 'western_asia', 'northern_africa', 'middle_africa', 'western_africa', 'eastern_africa', 'southern_africa', 'northern_europe', 'western_europe', 'central_europe', 'eastern_europe', 'southern_europe', 'caribbean', 'northern_americas', 'central_america', 'south_america', 'polynesia', 'australia_and_new_zealand', 'melanesia', 'micronesia']
@@ -59,6 +61,16 @@ def get_new_id(entity_dict, old_id):
         return min(entity_dict[convert_name(old_id)])
     return old_id
 
+
+def make_token_list(tokenizer, text_data):
+    token_dict = tokenizer(text_data)
+    input_list = token_dict['input_ids']
+    attention_mask_list = token_dict['attention_mask']
+
+    tokens_tensor_list = [torch.tensor(x) for x in zip(input_list, attention_mask_list)]
+    tokens_tensor_list = [torch.cat((x[:, 0:CONTEXT_SIZE],x[:, -1:]), dim=1) for x in tokens_tensor_list] # truncate to CONTEXT SIZE but keep eos token
+
+    return tokens_tensor_list
 
 CONTEXT_SIZE = 128
 def generate_datasets_split_entities(entity_dict, text_dict):
@@ -155,14 +167,14 @@ def generate_datasets_split_entities(entity_dict, text_dict):
 
     tokenizer = AutoTokenizer.from_pretrained('roberta-base')
 
-    token_dict = tokenizer(text_data)
-    input_list = token_dict['input_ids']
-    attention_mask_list = token_dict['attention_mask']
+    masked_text_data = text_data.copy()
+    for i in range(len(masked_text_data)):
+        for c in COUNTRIES:
+            masked_text_data[i] = re.sub(c.replace("_", " "), "<mask>", masked_text_data[i], flags=re.IGNORECASE)
 
-    tokens_tensor_list = [torch.tensor(x) for x in zip(input_list, attention_mask_list)]
-    tokens_tensor_list = [torch.cat((x[:, 0:CONTEXT_SIZE],x[:, -1:]), dim=1) for x in tokens_tensor_list] # truncate to CONTEXT SIZE but keep eos token
 
-    torch.save(tokens_tensor_list, 'data/raw/tokens_tensor_list.pt')
+    torch.save(make_token_list(tokenizer, text_data), 'data/raw/tokens_tensor_list.pt')
+    torch.save(make_token_list(tokenizer, masked_text_data), 'data/raw/masked_tokens_tensor_list.pt')
 
 
 if __name__ == "__main__":

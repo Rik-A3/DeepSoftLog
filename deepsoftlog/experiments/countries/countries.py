@@ -49,7 +49,6 @@ def eval(folder: str):
     trainer.eval(eval_dataloader)
 
 
-
 if __name__ == "__main__":
-    train("deepsoftlog/experiments/countries/config.yaml")
+    train("config.yaml")
 
