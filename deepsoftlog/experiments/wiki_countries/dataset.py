@@ -15,7 +15,7 @@ _DATA_ROOT = str(Path(__file__).parent / "tmp")
 class WikiDataset(TorchDataset):
     def __init__(self, masked=False):
         base_path = Path(__file__).parent / 'data' / 'raw'
-        self.data = torch.load(base_path / ("masked_" if masked else "") + f"tokens_tensor_list.pt")
+        self.data = torch.load(base_path / ("masked_" if masked else "").__add__("tokens_tensor_list.pt"))
 
         super().__init__()
 
