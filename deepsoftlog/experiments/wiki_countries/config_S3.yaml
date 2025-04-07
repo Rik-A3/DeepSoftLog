@@ -1,6 +1,7 @@
 project: wiki_countries
 name: S3
 program: deepsoftlog/experiments/wiki_countries/data/tmp/countries_S3.pl
+masked: false
 seed: 1337
 verbose: true
 data_subset: null
