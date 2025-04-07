@@ -5,7 +5,7 @@ seed: 1337
 verbose: true
 data_subset: null
 device: cuda
-device_nb: 1
+device_nb: 2
 semantics: sdd2
 
 # optimization
