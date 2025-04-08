@@ -4,7 +4,7 @@ import random
 import torch
 from torch.utils.data import Dataset as TorchDataset
 
-from deepsoftlog.data import load_tsv_file, data_to_prolog, Query, to_prolog_text, load_txt_file, load_lines
+from deepsoftlog.data import load_tsv_file, data_to_prolog, Query, to_prolog_text
 from deepsoftlog.algebraic_prover.terms.expression import Constant, Expr
 from deepsoftlog.data.dataloader import DataLoader
 from deepsoftlog.data.dataset import StaticDataset, Dataset

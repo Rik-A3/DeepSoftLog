@@ -43,6 +43,7 @@ def _carry_probs(x1, x2):
     result[1] = 1 - result[0]
     return result
 
+
 class EmbeddingFunctor(nn.Module):
     def __init__(self, arity=1, ndims=128):
         super().__init__()
@@ -92,20 +93,6 @@ class LeNet5(nn.Module):
         x = self.classifier(x)[0]
         return self.activation(x)
         #return
-
-class Llama31_8B(nn.Module):
-    """
-    TODO
-    """
-
-    def __init__(self):
-        pass # TODO
-
-    def forward(self, x):
-        pass # TODO
-
-    def eval(self):
-        pass # TODO
 
 MULTIPLIER = 6364136223846793005
 INCREMENT = 1
