@@ -115,16 +115,16 @@ def _reduce_last_axis(x: Tensor) -> Tensor:
         # acc %= MODULUS  # Not really necessary.
     return acc
 
-class XLMRobertaLarge(nn.Module):
+class RobertaLarge(nn.Module):
     """
-    https://huggingface.co/FacebookAI/xlm-roberta-large
+    https://huggingface.co/FacebookAI/roberta-large
     """
 
     def __init__(self, ndims=100):
         super().__init__()
 
-        self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
-        self.model = AutoModel.from_pretrained("xlm-roberta-large")
+        self._tokenizer = AutoTokenizer.from_pretrained('facebookAI/roberta-large')
+        self.model = AutoModel.from_pretrained('facebookAI/roberta-large')
         for name,param in self.model.encoder.named_parameters():
             if int(name.split(".")[1]) < 22: # All but the last layer
                 param.requires_grad = False
@@ -159,7 +159,7 @@ class XLMRobertaLarge(nn.Module):
 
 
 if __name__ == "__main__":
-    model = XLMRobertaLarge()
+    model = RobertaLarge()
     tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large")
     ts = list([torch.tensor(x) for x in tokenizer(["Hello, my dog is cute.", "Hello, my cat is cute."]).values()])
     embedding = model(torch.stack(ts, dim=1))

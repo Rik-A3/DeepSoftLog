@@ -3,11 +3,11 @@ import torch
 from torch import Tensor
 from torch import nn
 
-from ..embeddings.nn_models import LeNet5, XLMRobertaLarge
+from ..embeddings.nn_models import LeNet5, RobertaLarge
 
 SPECIAL_MODELS = {
     ("lenet5", 1): LeNet5,
-    ("roberta", 1): XLMRobertaLarge
+    ("roberta", 1): RobertaLarge
 }
 
 
