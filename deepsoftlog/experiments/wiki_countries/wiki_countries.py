@@ -4,6 +4,7 @@ import torch
 
 from deepsoftlog.experiments.wiki_countries.dataset import generate_prolog_files, get_val_dataloader, \
     get_train_dataloader, get_test_dataloader
+from deepsoftlog.experiments.wiki_countries.preprocess import make_tensor_lists
 from deepsoftlog.training import load_program, load_config
 from deepsoftlog.training.logger import WandbLogger
 from deepsoftlog.training.loss import nll_loss, get_optimizer
@@ -13,13 +14,14 @@ def train(cfg_path):
     cfg = load_config(cfg_path)
     if isinstance(cfg.seed, list):
         for seed in cfg.seed:
-            cfg.seed = seed
+            cfg['seed'] = seed
             _train(cfg)
     else:
         _train(cfg)
 
 def _train(cfg):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.device_nb)
+    make_tensor_lists()
     generate_prolog_files()
     eval_dataloader = get_val_dataloader(cfg)
     program = load_program(cfg, eval_dataloader)
