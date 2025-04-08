@@ -36,7 +36,7 @@ def _train(cfg):
     )
     trainer.val_dataloader = eval_dataloader
     trainer.train(cfg)
-    trainer.eval(get_test_dataloader())
+    trainer.eval(get_test_dataloader(cfg))
 
 
 def eval(folder: str):
