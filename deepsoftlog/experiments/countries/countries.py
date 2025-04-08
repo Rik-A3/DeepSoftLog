@@ -7,6 +7,17 @@ from deepsoftlog.training.logger import WandbLogger
 from deepsoftlog.training.loss import nll_loss, get_optimizer
 from deepsoftlog.training.trainer import Trainer
 
+def visualise(trainer, logger, cfg):
+    # visualise task
+    region_matrix, subregion_matrix = get_located_in_matrix(cfg.name)
+    fig1 = visualise_matrix(region_matrix, COUNTRIES)
+    fig2 = visualise_matrix(subregion_matrix, COUNTRIES)
+    logger.log_fig(fig1, name="region matrix")
+    logger.log_fig(fig2, name="subregion matrix")
+    # visualise soft unification scores
+    names, matrix = trainer.program.get_soft_unification_matrix()
+    fig = visualise_matrix(matrix, names)
+    logger.log_fig(fig, name="similarity matrix")
 
 def train(cfg):
     cfg = load_config(cfg)
@@ -25,16 +36,7 @@ def train(cfg):
     trainer.val_dataloader = eval_dataloader
     trainer.train(cfg)
     trainer.eval(get_test_dataloader())
-    # visualise task
-    region_matrix, subregion_matrix = get_located_in_matrix(cfg.name)
-    fig1 = visualise_matrix(region_matrix, COUNTRIES)
-    fig2 = visualise_matrix(subregion_matrix, COUNTRIES)
-    logger.log_fig(fig1, name="region matrix")
-    logger.log_fig(fig2, name="subregion matrix")
-    # visualise soft unification scores
-    names, matrix = trainer.program.get_soft_unification_matrix()
-    fig = visualise_matrix(matrix, names)
-    logger.log_fig(fig, name="similarity matrix")
+    visualise(trainer, logger, cfg)
 
 
 def eval(folder: str):
@@ -47,8 +49,9 @@ def eval(folder: str):
     trainer.max_branching = cfg['max_branching']
     trainer.max_depth = cfg['max_depth']
     trainer.eval(eval_dataloader)
+    visualise(trainer, logger, cfg)
 
 
 if __name__ == "__main__":
-    train("config.yaml")
+    train("deepsoftlog/experiments/countries/config.yaml")
 

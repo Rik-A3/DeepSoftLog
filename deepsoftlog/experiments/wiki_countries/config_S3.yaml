@@ -2,7 +2,7 @@ project: wiki_countries
 name: S3
 program: deepsoftlog/experiments/wiki_countries/data/tmp/countries_S3.pl
 masked: false
-seed: 1337
+seed: [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346]
 verbose: true
 data_subset: null
 device: cuda
@@ -18,8 +18,8 @@ nb_epochs: 6
 batch_size: 4
 grad_clip: null
 max_proofs: null
-max_depth: 2
-max_branching: 5
+max_depth: 3
+max_branching: 4
 
 # embeddings
 embedding_dimensions: 100

@@ -2,7 +2,7 @@ project: wiki_countries
 name: S2
 program: deepsoftlog/experiments/wiki_countries/data/tmp/countries_S2.pl
 masked: false
-seed: 1337
+seed: [1337, 1338, 1339, 1340, 1341, 1342, 1343, 1344, 1345, 1346]
 verbose: true
 data_subset: null
 device: cuda

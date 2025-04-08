@@ -9,8 +9,16 @@ from deepsoftlog.training.logger import WandbLogger
 from deepsoftlog.training.loss import nll_loss, get_optimizer
 from deepsoftlog.training.trainer import Trainer
 
-def train(cfg):
-    cfg = load_config(cfg)
+def train(cfg_path):
+    cfg = load_config(cfg_path)
+    if isinstance(cfg.seed, list):
+        for seed in cfg.seed:
+            cfg.seed = seed
+            _train(cfg)
+    else:
+        _train(cfg)
+
+def _train(cfg):
     os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.device_nb)
     generate_prolog_files()
     eval_dataloader = get_val_dataloader(cfg)

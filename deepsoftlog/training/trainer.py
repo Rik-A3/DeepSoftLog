@@ -15,6 +15,7 @@ import torch.distributed as dist
 
 from ..data.dataloader import DataLoader
 from ..data.query import Query
+from ..experiments.countries.visualise import visualise_matrix
 from ..logic.spl_module import SoftProofModule
 from .logger import PrintLogger, WandbLogger
 from .loss import nll_loss, get_optimizer

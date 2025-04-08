@@ -9,7 +9,7 @@ SUBREGIONS = ['eastern_africa', 'middle_africa', 'northern_africa','southern_afr
 REGIONS = ['africa', 'americas', 'asia', 'europe', 'oceania']
 
 def visualise_matrix(matrix, names):
-    idxs = [COUNTRIES.index(name) for name in filter(lambda x: x in COUNTRIES, names)]
+    idxs = [list(names).index(c) for c in filter(lambda x: x in names, COUNTRIES)]
     matrix = matrix[idxs][:, idxs]
     fig, ax = plt.subplots(figsize=(8, 6))
     cax = ax.matshow(matrix, cmap='viridis')

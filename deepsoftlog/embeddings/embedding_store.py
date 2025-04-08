@@ -75,14 +75,13 @@ class EmbeddingStore(nn.Module):
         self.device = device
         return super().to(device)
 
-    def get_soft_unification_matrix(self, distance_metric: str):
-        constants = list(self.constant_embeddings.keys())
-        n = len(constants)
+    def get_soft_unification_matrix(self, distance_metric: str, names):
+        n = len(names)
         matrix = torch.zeros(n, n)
-        for i, c1 in enumerate(constants):
-            for j, c2 in enumerate(constants):
+        for i, c1 in enumerate(names):
+            for j, c2 in enumerate(names):
                 e1, e2 = self.constant_embeddings[c1], self.constant_embeddings[c2]
-                matrix[i, j] = math.exp(embedding_similarity(e1, e2, distance_metric))
+                matrix[i, j] = embedding_similarity(e1, e2, distance_metric) # log probabilities
         return matrix.detach().numpy()
 
 def create_embedding_store(config, vocab_sources: Iterable) -> EmbeddingStore:
