@@ -60,3 +60,6 @@ class WandbLogger(Logger):
     def log_fig(self, fig, name):
         self._init_wandb()
         wandb.log({name: wandb.Image(fig)})
+
+    def finish(self):
+        wandb.finish()
