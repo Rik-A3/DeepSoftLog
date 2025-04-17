@@ -4,7 +4,7 @@ from deepsoftlog.experiments.mnist_addition.addition import train as train_addit
 from deepsoftlog.experiments.countries.countries import train as train_countries
 from deepsoftlog.experiments.wiki_countries.wiki_countries import train as train_wiki_countries
 from deepsoftlog.experiments.fsm.fsm import train as train_fsm
-from deepsoftlog.experiments.mentions_countries import train as train_mentions
+from deepsoftlog.experiments.mentions_countries.mentions_countries import train as train_mentions
 
 
 def main(experiment_name, config_file):
