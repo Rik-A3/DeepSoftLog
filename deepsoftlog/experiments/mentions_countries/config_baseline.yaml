@@ -1,7 +1,8 @@
 project: mentions_countries
-name: S2
-program: deepsoftlog/experiments/mentions_countries/data/tmp/countries_100_S2.pl
-seed: 1337
+name: [S1,S2,S3]
+held_out: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+program: deepsoftlog/experiments/mentions_countries/data/tmp/countries_{}_{}.pl
+seed: [1,2,3,4,5,6,7,8,9,10]
 verbose: true
 data_subset: null
 device: cpu

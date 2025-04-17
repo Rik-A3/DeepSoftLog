@@ -1,3 +1,5 @@
+import itertools
+from collections.abc import Iterator
 from pathlib import Path
 import os
 import random
@@ -31,6 +33,22 @@ class ConfigDict(dict):
         with open(file_name, "w+") as f:
             yaml.dump(dict(self), f)
 
+class GridSearch(Iterator):
+    def __init__(self, cfg, grid_params):
+        self.cfg = cfg
+        self.grid_params = grid_params
+        self.do_asserts()
+
+    def do_asserts(self):
+        for param in self.grid_params:
+            assert isinstance(self.cfg[param], list), f"Parameter {param} should be a list in the config file."
+
+    def __next__(self):
+        for vs in itertools.product(*map(self.cfg.get, self.grid_params)):
+            tmp_cfg = self.cfg.copy()
+            for i,p in enumerate(self.grid_params):
+                tmp_cfg[p] = vs[i]
+            return tmp_cfg
 
 def load_program(config, init_dataloader: "DataLoader") -> "Program":
     config = load_config(config)

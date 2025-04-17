@@ -3,14 +3,20 @@ import os
 import torch
 
 from deepsoftlog.experiments.mentions_countries.dataset import generate_prolog_files, get_test_dataloader, get_train_dataloader, get_val_dataloader
-from deepsoftlog.training import load_program, load_config
+from deepsoftlog.training import load_program, load_config, GridSearch
 from deepsoftlog.training.logger import WandbLogger
 from deepsoftlog.training.loss import nll_loss, get_optimizer
 from deepsoftlog.training.trainer import Trainer
 
-def train(cfg):
-    cfg = load_config(cfg)
+def train(cfg_path):
+    cfg = load_config(cfg_path)
     os.environ["CUDA_VISIBLE_DEVICES"] = str(cfg.device_nb)
+    cfg_iterator = GridSearch(cfg, ["name","held_out","seed"])
+    for grid_cfg in cfg_iterator:
+        grid_cfg["program"] = grid_cfg["program"].format(grid_cfg["held_out"], grid_cfg["name"])
+        _train(grid_cfg)
+
+def _train(cfg):
     generate_prolog_files()
     eval_dataloader = get_val_dataloader()
     program = load_program(cfg, eval_dataloader)
