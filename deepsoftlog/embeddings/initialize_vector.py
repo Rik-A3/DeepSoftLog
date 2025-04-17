@@ -3,19 +3,19 @@ import torch
 from torch import Tensor
 from torch import nn
 
-from ..embeddings.nn_models import LeNet5, RobertaLarge
+from ..embeddings.nn_models import LeNet5, RobertaLarge, BaselineTextEmbedder
 
 SPECIAL_MODELS = {
     ("lenet5", 1): LeNet5,
-    ("roberta", 1): RobertaLarge
+    ("roberta", 1): RobertaLarge,
 }
 
-
 class Initializer:
-    def __init__(self, model: nn.Module, init_mode: str, ndim: int):
+    def __init__(self, model: nn.Module, init_mode: str, ndim: int, text_embedding_mode: str = None):
         self.ndim = ndim
         self.init_mode = init_mode
         self.model = model
+        self.text_embedding_mode = text_embedding_mode
 
     def __call__(self, x) -> Tensor | nn.Module:
         if isinstance(x, str):
@@ -37,6 +37,8 @@ class Initializer:
         return embedding
 
     def _initialize_functor(self, name: str, arity: int) -> nn.Module:
+        if name == "text" and arity == 1:
+            return RobertaLarge(self.ndim) if self.text_embedding_mode == "LM" else BaselineTextEmbedder(self.ndim)
         if (name, arity) in SPECIAL_MODELS:
             return SPECIAL_MODELS[(name, arity)](self.ndim)
         return self.model(arity, self.ndim)

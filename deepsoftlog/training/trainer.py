@@ -15,7 +15,6 @@ import torch.distributed as dist
 
 from ..data.dataloader import DataLoader
 from ..data.query import Query
-from ..experiments.countries.visualise import visualise_matrix
 from ..logic.spl_module import SoftProofModule
 from .logger import PrintLogger, WandbLogger
 from .loss import nll_loss, get_optimizer
@@ -160,6 +159,10 @@ class Trainer:
                 self.get_store().functor_embeddings["('roberta', 1)"].reset_cache()
             except:
                 pass
+            try:
+                self.get_store().functor_embeddings["('text', 1)"].reset_cache()
+            except:
+                pass
         proof_steps, nb_proofs = float(np.mean(proof_steps)), float(np.mean(nb_proofs))
         return float(loss), float(np.mean(errors)), proof_steps, nb_proofs
 
@@ -180,7 +183,7 @@ class Trainer:
             shutil.rmtree(save_folder, ignore_errors=True)
         save_folder.mkdir(parents=True)
 
-        config.save(save_folder / "config.yaml")
+        config.save(save_folder / "config_baseline.yaml")
         torch.save(self.get_store().state_dict(), save_folder / "store.pt")
 
     def get_store(self):

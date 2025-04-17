@@ -2,6 +2,7 @@ import pickle
 
 import torch
 from torch import Tensor
+from transformers import AutoTokenizer
 
 from deepsoftlog.algebraic_prover.terms.expression import Expr
 
@@ -39,11 +40,43 @@ class BatchSoftTerm(Expr):
     def __getitem__(self, item):
         return SoftTerm(self.arguments[item])
 
+TOKENIZER = AutoTokenizer.from_pretrained('facebookAI/roberta-large')
 
 # monkey-patching on Expr for convenience
 # Expr.__invert__ = lambda self: SoftTerm(self)
 # Expr.is_soft = lambda self: self.functor == "~"
+class TextTerm(Expr):
+    def __init__(self, text: str):
+        super().__init__(f"text{len(text)}")
+        text = text.replace(":", " ")
+        tokens = TOKENIZER(text, return_tensors="pt")
+        self.tensor = torch.cat((tokens["input_ids"], tokens["attention_mask"]))
 
+    def get_tensor(self):
+        return self.tensor
+
+    def with_args(self, arguments):
+        assert len(arguments) == 0
+        return self
+
+    def __repr__(self):
+        return f"t{str(hash(self))[-3:]}"
+
+    def __str__(self):
+        return repr(self)
+
+    def __eq__(self, other):
+        return isinstance(other, TensorTerm) \
+            and self.tensor.shape == other.tensor.shape \
+            and torch.all(self.tensor == other.tensor)
+
+    def __hash__(self):
+        return hash(pickle.dumps(self.tensor))
+
+    def show(self):
+        from matplotlib import pyplot as plt
+        plt.imshow(self.tensor[0], cmap='gray')
+        plt.show()
 
 class TensorTerm(Expr):
     def __init__(self, tensor: Tensor):

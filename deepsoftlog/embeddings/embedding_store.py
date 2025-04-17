@@ -7,7 +7,7 @@ from torch import nn
 from ..parser.vocabulary import Vocabulary
 from .distance import embedding_similarity
 from .initialize_vector import Initializer
-from ..logic.soft_term import TensorTerm
+from ..logic.soft_term import TensorTerm, TextTerm
 from .nn_models import EmbeddingFunctor
 from deepsoftlog.algebraic_prover.terms.expression import Expr
 
@@ -53,7 +53,7 @@ class EmbeddingStore(nn.Module):
         return e
 
     def _embed_constant(self, term: Expr):
-        if isinstance(term, TensorTerm):
+        if isinstance(term, TensorTerm) or isinstance(term, TextTerm):
             return term.get_tensor().to(self.device)
 
         name = term.functor
@@ -87,7 +87,7 @@ class EmbeddingStore(nn.Module):
 def create_embedding_store(config, vocab_sources: Iterable) -> EmbeddingStore:
     ndim = config['embedding_dimensions']
     vocabulary = create_vocabulary(vocab_sources)
-    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim)
+    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim, config.get("text_embedding_mode"))
     store = EmbeddingStore(ndim, initializer, vocabulary)
     return store
 

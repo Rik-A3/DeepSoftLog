@@ -14,6 +14,7 @@ from deepsoftlog.algebraic_prover.terms.probability_annotation import (
 from deepsoftlog.algebraic_prover.terms.expression import *
 from deepsoftlog.algebraic_prover.terms.transformations import normalize_clauses
 from deepsoftlog.algebraic_prover.terms.variable import Variable
+from deepsoftlog.logic.soft_term import TextTerm
 
 
 def split(
@@ -81,6 +82,8 @@ class PrologParser:
         if start_bracket != -1:
             functor = term_str[:start_bracket]
             arguments = split(term_str[start_bracket + 1 : -1], ",")
+            if functor == "text":
+                return Expr(functor, *(TextTerm(argument) for argument in arguments))
             return Expr(
                 functor, *(self.parse_termvar(argument) for argument in arguments)
             )

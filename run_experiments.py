@@ -13,4 +13,5 @@ def main(experiment_name, config_file):
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    #main(*sys.argv[1:])
+    main("wiki_countries", "deepsoftlog/experiments/wiki_countries/config_S1.yaml")

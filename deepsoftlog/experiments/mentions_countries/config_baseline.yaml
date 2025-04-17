@@ -1,0 +1,27 @@
+project: mentions_countries
+name: S2
+program: deepsoftlog/experiments/mentions_countries/data/tmp/countries_100_S2.pl
+seed: 1337
+verbose: true
+data_subset: null
+device: cpu
+device_nb: 0
+semantics: sdd2
+
+# optimization
+optimizer: AdamW
+embedding_learning_rate: 0.01
+functor_learning_rate: 0.01
+weight_decay: 0
+nb_epochs: 6
+batch_size: 4
+grad_clip: null
+max_proofs: null
+max_depth: 2
+max_branching: 4
+
+# embeddings
+embedding_dimensions: 100
+embedding_initialization: sphere
+embedding_metric: angle
+text_embedding_mode: baseline
