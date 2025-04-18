@@ -32,6 +32,7 @@ def _train(cfg):
     trainer.val_dataloader = eval_dataloader
     trainer.train(cfg)
     trainer.eval(get_test_dataloader())
+    logger.finish()
 
 def eval(folder: str):
     cfg = load_config(f"results/{folder}/config.yaml")
