@@ -33,6 +33,10 @@ class ConfigDict(dict):
         with open(file_name, "w+") as f:
             yaml.dump(dict(self), f)
 
+    def copy(self):
+        return ConfigDict(self)
+
+
 class GridSearch(Iterator):
     def __init__(self, cfg, grid_params):
         self.cfg = cfg
