@@ -170,7 +170,7 @@ class Trainer:
         return float(grad_norm)
 
     def save(self, config: ConfigDict):
-        save_folder = f"results/{config['name']}"
+        save_folder = f"{config.get('results_dir', 'results')}/{config['name']}"
         save_folder = Path(save_folder)
         if save_folder.exists():
             shutil.rmtree(save_folder, ignore_errors=True)
