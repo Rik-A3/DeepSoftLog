@@ -124,9 +124,9 @@ class RobertaBase(nn.Module):
 		super().__init__()
 		self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 		self.model = AutoModel.from_pretrained("xlm-roberta-base")
-		for name,param in self.model.encoder.named_parameters():
-			if int(name.split(".")[1]) < 11: # All but the last layer
-				param.requires_grad = False
+		# for name,param in self.model.encoder.named_parameters():
+		# 	if int(name.split(".")[1]) < 11: # All but the last layer
+		# 		param.requires_grad = False
 		self.output_layer = nn.Linear(768, ndims)
 		self.embedding_cache = {}
 		self.half_precision = True
