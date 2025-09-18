@@ -65,7 +65,6 @@ def get_test_dataloader():
     eval_dataset = MentionsCountriesDataset("test").mutate_all_output(domain)
     return DataLoader(eval_dataset, batch_size=1, shuffle=False)
 
-
 def get_val_dataloader():
     regions = ["africa", "americas", "asia", "europe", "oceania"]
     domain = {-1: [SoftTerm(Constant(r)) for r in regions]}

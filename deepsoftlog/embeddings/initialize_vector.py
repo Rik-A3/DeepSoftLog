@@ -7,15 +7,18 @@ from ..embeddings.nn_models import LeNet5, RobertaBase, BaselineTextEmbedder
 
 SPECIAL_MODELS = {
     ("lenet5", 1): LeNet5,
+}
+SPECIAL_PRETRAINED_MODELS = {
     ("roberta", 1): RobertaBase,
 }
 
 class Initializer:
-    def __init__(self, model: nn.Module, init_mode: str, ndim: int, text_embedding_mode: str = None):
+    def __init__(self, model: nn.Module, init_mode: str, ndim: int, text_embedding_mode: str = None, freeze_layers: int = 12):
         self.ndim = ndim
         self.init_mode = init_mode
         self.model = model
         self.text_embedding_mode = text_embedding_mode
+        self.freeze_layers = freeze_layers
 
     def __call__(self, x) -> Tensor | nn.Module:
         if isinstance(x, str):
@@ -41,6 +44,8 @@ class Initializer:
             return RobertaBase(self.ndim) if self.text_embedding_mode == "LM" else BaselineTextEmbedder(self.ndim)
         if (name, arity) in SPECIAL_MODELS:
             return SPECIAL_MODELS[(name, arity)](self.ndim)
+        if (name, arity) in SPECIAL_PRETRAINED_MODELS: # Pretrained models have the freeze_layers argument
+            return SPECIAL_PRETRAINED_MODELS[(name, arity)](self.ndim, freeze_layers=self.freeze_layers)
         return self.model(arity, self.ndim)
 
 

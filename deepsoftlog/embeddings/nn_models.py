@@ -120,19 +120,18 @@ class RobertaBase(nn.Module):
 	https://huggingface.co/FacebookAI/roberta-base
 	"""
 
-	def __init__(self, ndims=100):
+	def __init__(self, ndims=100, freeze_layers=12):
 		super().__init__()
 		self._tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-base")
 		self.model = AutoModel.from_pretrained("xlm-roberta-base")
-		# for name,param in self.model.encoder.named_parameters():
-		# 	if int(name.split(".")[1]) < 11: # All but the last layer
-		# 		param.requires_grad = False
+		for name,param in self.model.encoder.named_parameters():
+			if int(name.split(".")[1]) < freeze_layers: # Roberta-XLM has layers 0-11
+				param.requires_grad = False
 		self.output_layer = nn.Linear(768, ndims)
 		self.embedding_cache = {}
-		self.half_precision = True
 		self.counter = 0
 
-	def half_precision(self):
+	def half_precision(self): # not used
 		self.model.half()
 
 		for layer in self.model.modules():
@@ -148,7 +147,6 @@ class RobertaBase(nn.Module):
 		return self.embedding_cache[hash_tensor(x)]
 
 	def _forward(self, x):
-
 		tokens = x[:, 0, :]
 		attention_mask = x[:, 1, :]
 

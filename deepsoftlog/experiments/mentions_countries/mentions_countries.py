@@ -10,7 +10,12 @@ from deepsoftlog.training.loss import nll_loss, get_optimizer
 from deepsoftlog.training.trainer import Trainer
 
 def train(cfg_path, name, seed, program, text_embedding_mode,
-          device='cpu', device_nb=0):
+          device='cpu', device_nb=0, freeze_layers=12):
+    """
+    Train a model for the mentions_countries task.
+    :param text_embedding_mode: text embedding mode (boe, LM)
+    :param freeze_layers: number of layers to freeze if using LM
+    """
     cfg = load_config(cfg_path)
 
     cfg.update({
@@ -20,6 +25,7 @@ def train(cfg_path, name, seed, program, text_embedding_mode,
         "device": device,
         "device_nb": int(device_nb),
         "text_embedding_mode": text_embedding_mode,
+        "freeze_layers": freeze_layers,
     })
     _train(cfg)
 

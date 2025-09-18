@@ -91,7 +91,7 @@ class EmbeddingStore(nn.Module):
 def create_embedding_store(config, vocab_sources: Iterable) -> EmbeddingStore:
     ndim = config['embedding_dimensions']
     vocabulary = create_vocabulary(vocab_sources)
-    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim, config.get("text_embedding_mode"))
+    initializer = Initializer(EmbeddingFunctor, config['embedding_initialization'], ndim, config.get("text_embedding_mode"), config.get("freeze_layers"))
     store = EmbeddingStore(ndim, initializer, vocabulary)
     return store
 
