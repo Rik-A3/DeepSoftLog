@@ -1,8 +1,6 @@
 project: mentions_countries
 verbose: true
 data_subset: null
-device: cuda
-device_nb: 2
 semantics: sdd2
 
 # optimization
@@ -20,4 +18,3 @@ max_branching: 4
 embedding_dimensions: 100
 embedding_initialization: sphere
 embedding_metric: angle
-text_embedding_mode: baseline
