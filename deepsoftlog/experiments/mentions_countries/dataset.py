@@ -107,7 +107,7 @@ class MentionsCountriesDataset(StaticDataset):
 def generate_prolog_files():
     base_path = Path(__file__).parent / 'data'
     (base_path / 'tmp').mkdir(exist_ok=True)
-    for setting in ['', '_country2text', '_relation2text', '_country2text_relation2text']:
+    for setting in ['', '_relation2text', '_relation2text_traintest']:
         for problem in (f'S{i}' for i in range(1,4)):
             data = load_tsv_file(base_path / f"raw/countries_{problem}{setting}.tsv")
             data = data_to_prolog(data, name="countries")
@@ -122,6 +122,6 @@ def generate_prolog_files():
 if __name__ == "__main__":
     generate_tsvs(country_to_text=False, relation_to_text=True, test_split=False)
     generate_tsvs(country_to_text=False, relation_to_text=True, test_split=True)
-    # d = MentionsCountriesDataset()
-    # print(d)
-    # generate_prolog_files()
+    d = MentionsCountriesDataset()
+    print(d)
+    generate_prolog_files()
