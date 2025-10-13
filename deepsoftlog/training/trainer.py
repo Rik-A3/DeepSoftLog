@@ -151,7 +151,7 @@ class Trainer:
 
     def get_loss(self, queries: Iterable[Query]) -> tuple[float, float, float, float]:
         results, proof_steps, nb_proofs = tuple(zip(*self._query(queries)))
-        losses = [self.criterion(result, query.p).detach() for result, query in zip(results, queries)]
+        losses = [self.criterion(result, query.p) for result, query in zip(results, queries)]
         loss = torch.stack(losses).mean()
         errors = [query.error_with(result) for result, query in zip(results, queries)]
         if loss.requires_grad:
