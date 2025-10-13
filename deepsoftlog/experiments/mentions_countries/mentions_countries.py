@@ -64,4 +64,4 @@ def eval(folder: str):
 
 
 if __name__ == "__main__":
-    train("deepsoftlog/experiments/mentions_countries/config.yaml", 'test', 0, 'deepsoftlog/experiments/mentions_countries/data/tmp/countries_S1_relation2text.pl', 'boe')
+    train("deepsoftlog/experiments/mentions_countries/config.yaml", 'test', 0, 'deepsoftlog/experiments/mentions_countries/data/tmp/countries_S1_relation2text.pl', 'LM')
