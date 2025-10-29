@@ -162,3 +162,4 @@ class SddAlgebra(CompoundAlgebra[SddFormula]):
 
     def reset(self):
         self.all_facts = FastList()
+        self.manager.garbage_collect()
